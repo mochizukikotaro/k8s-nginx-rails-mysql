@@ -20,8 +20,10 @@ default: &default
 development:
   <<: *default
   database: myapp_development
-  host: db
-  password: password
+  # host: db # for docker-compose
+  host: 127.0.0.1  # for k8s
+  username: root
+  password: pass
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

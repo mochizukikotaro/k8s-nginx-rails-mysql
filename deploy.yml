@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: blog
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        application: rails
+    spec:
+      containers:
+        - image: gcr.io/${PROJECT_ID}/${IMAGE_NGINX}
+          name: nginx
+          ports:
+            - containerPort: 80
+
+        - image: gcr.io/${PROJECT_ID}/${IMAGE_RAILS}
+          name: rails
+          ports:
+            - containerPort: 3000
+          command: ["puma"]
+
+        - image: gcr.io/cloudsql-docker/gce-proxy:1.09
+          name: cloudsql-proxy
+          command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                    "-instances=${INSTANCE_CONNECTION_NAME}=tcp:3306",
+                    "-credential_file=/secrets/cloudsql/${CREDENTIALS}"]
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+            - name: cloudsql
+              mountPath: /cloudsql
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+        - name: cloudsql
+          emptyDir:
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-yml
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    name: nginx
+  - port: 3000
+    name: rails
+  selector:
+    application: rails
