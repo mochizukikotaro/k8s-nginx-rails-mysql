@@ -16,4 +16,3 @@ WORKDIR /myapp
 ADD Gemfile /myapp/Gemfile
 ADD Gemfile.lock /myapp/Gemfile.lock
 ADD . /myapp
-RUN bundle install
