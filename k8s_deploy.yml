@@ -35,7 +35,7 @@ spec:
       volumes:
         - name: cloudsql-instance-credentials
           secret:
-            secretName: cloudsql-instance-credentials
+            secretName: cloudsql-instance-credentials-sample
         - name: cloudsql
           emptyDir:
 
